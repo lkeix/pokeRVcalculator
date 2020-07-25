@@ -350,7 +350,7 @@ export default {
       drawer: false,
       window_height: 500,
       twitterlink: "https://twitter.com/c_ade_",
-      githublink: "",
+      githublink: "https://github.com/rxaru/pokeRVcalculator",
       pokemons: [],
       chars: [],
       char: {},
