@@ -8,7 +8,7 @@
       >
         <v-app-bar-nav-icon @click="drawer = true"></v-app-bar-nav-icon>
 
-        <v-toolbar-title>Pokemon RV Calclator</v-toolbar-title>
+        <v-toolbar-title>pokemon RV Calculator</v-toolbar-title>
       </v-app-bar>
 
       <v-card v-if="!phone">
@@ -899,7 +899,7 @@ export default {
       pokemon: {},
       lv: 50,
       sum: 0,
-      fix510: false,
+      fix510: true,
       fix: {
         HP: false,
         A: false,

@@ -8,7 +8,7 @@
       >
         <v-app-bar-nav-icon @click="drawer = true"></v-app-bar-nav-icon>
 
-        <v-toolbar-title>ポケモン実数値 カリキュレータ</v-toolbar-title>
+        <v-toolbar-title>pokemon RV Calculator</v-toolbar-title>
       </v-app-bar>
       <div style="margin: 15px;">
         <v-card>
