@@ -17,14 +17,15 @@
           <v-col cols="1" />
           <v-col cols="8">
             <v-card-actions>
-              <v-select
-                v-model="id"
-                :items="pokemons"
-                item-text="name"
-                item-value="id"
-                filled
-                label="ポケモンを選択"
-              ></v-select>
+              <v-autocomplete
+              v-model="id"  
+              :items="pokemons"
+              item-text="name"
+              item-value="id"
+              dense
+              filled
+              label="ポケモンを選択"
+              ></v-autocomplete>
             </v-card-actions>
           </v-col>
         </v-row>
@@ -282,14 +283,12 @@
             </v-card-text>
           </v-col>
         </v-row>
-        <!--
         <v-row>
           <v-col :cols="phone ? 4 : 5" />
           <v-col cols=3>
-            <v-btn color="primary">固定値で他の候補を計算する</v-btn>
+            <v-btn color="primary" @click="calcother">固定した値の他の候補を計算する</v-btn>
           </v-col>
         </v-row>
-        -->
       </v-card>
       <v-card v-else>
         <v-card-title></v-card-title>
@@ -297,14 +296,15 @@
           <v-col cols="1" />
           <v-col cols="8">
             <v-card-actions>
-              <v-select
-                v-model="id"
-                :items="pokemons"
-                item-text="name"
-                item-value="id"
-                filled
-                label="ポケモンを選択"
-              ></v-select>
+              <v-autocomplete
+              v-model="id"  
+              :items="pokemons"
+              item-text="name"
+              item-value="id"
+              dense
+              filled
+              label="ポケモンを選択"
+              ></v-autocomplete>
             </v-card-actions>
           </v-col>
         </v-row>
@@ -329,14 +329,14 @@
         <v-row>
           <v-col cols="1" />
           <v-col cols="8">
-            <v-select
+            <v-autocomplete
             @input="charset"
             :items="chars"
             item-text="char"
             item-value="id"
             filled
             label="性格"
-            ></v-select>
+            ></v-autocomplete>
           </v-col>
         </v-row>
         <v-row>
@@ -359,7 +359,6 @@
                     <v-icon>mdi-close</v-icon>
                   </v-btn>
                   <v-toolbar-title>個体値と努力値</v-toolbar-title>
-                  <v-spacer></v-spacer>
                 </v-toolbar>
                 <v-list three-line subheader>
                   <v-list-item>
@@ -425,6 +424,18 @@
                 </v-list>
               </v-card>
             </v-dialog>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="1" />
+          <v-col cols="4">
+            <v-checkbox v-model="fix510" label="努力値を510で設定" />
+          </v-col>
+          <v-col cols="3" />
+          <v-col cols="4" v-if="fix510">
+            <v-card-text>
+              <span style="font-size: 20px;">残り {{510 - sum}}</span>
+            </v-card-text>
           </v-col>
         </v-row>
         <v-divider />
@@ -584,7 +595,219 @@
             </v-card-text>
           </v-col>
         </v-row>
+        <v-row>
+          <v-col cols=2 />
+          <v-col cols=3>
+            <v-btn color="primary" @click="calcother">固定した値の他の候補を計算する</v-btn>
+          </v-col>
+        </v-row>
       </v-card>
+      <v-dialog v-model="resdialog" max-width="75%" hide-overlay transition="scale-transition" v-if="!phone">
+        <v-card>
+          <v-toolbar dark>
+            <v-btn icon dark @click="resdialog = false">
+              <v-icon>mdi-close</v-icon>
+            </v-btn>
+            <v-toolbar-title>その他の候補</v-toolbar-title>
+          </v-toolbar>
+          <v-card-title>この結果が必ず元の振り方より優れる訳ではありません。</v-card-title>
+          <v-card-actions>
+            <v-container>
+              <v-row>
+                <v-col cols=12>
+                  <p>元の振り方</p>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col cols=12>
+                  <p>{{char.char}}</p>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col cols=2>
+                  HP(努力値)
+                </v-col>
+                <v-col cols=2>
+                  A(努力値)
+                </v-col>
+                <v-col cols=2>
+                  B(努力値)
+                </v-col>
+                <v-col cols=2>
+                  C(努力値)
+                </v-col>
+                <v-col cols=2>
+                  D(努力値)
+                </v-col>
+                <v-col cols=2>
+                  S(努力値)
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col cols=2>
+                  {{value.HP}} ({{ev.HP}})
+                </v-col>
+                <v-col cols=2>
+                  {{value.A}} ({{ev.A}})
+                </v-col>
+                <v-col cols=2>
+                  {{value.B}} ({{ev.B}})
+                </v-col>
+                <v-col cols=2>
+                  {{value.C}} ({{ev.C}})
+                </v-col>
+                <v-col cols=2>
+                  {{value.D}} ({{ev.D}})
+                </v-col>
+                <v-col cols=2>
+                  {{value.S}} ({{ev.S}})
+                </v-col>
+              </v-row>
+            </v-container>
+          </v-card-actions>
+          <v-divider />
+          <v-card-actions v-for="item in candidations" v-bind:key="item.id">
+            <v-container>
+              <v-row>
+                <v-col cols=12>
+                  <p>{{item.char}}</p>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col cols=2>
+                  {{item.HP}} ({{item.ev.HP}})
+                </v-col>
+                <v-col cols=2>
+                  {{item.A}} ({{item.ev.A}})
+                </v-col>
+                <v-col cols=2>
+                  {{item.B}} ({{item.ev.B}})
+                </v-col>
+                <v-col cols=2>
+                  {{item.C}} ({{item.ev.C}})
+                </v-col>
+                <v-col cols=2>
+                  {{item.D}} ({{item.ev.D}})
+                </v-col>
+                <v-col cols=2>
+                  {{item.S}} ({{item.ev.S}})
+                </v-col>
+              </v-row>
+            </v-container>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+      <v-dialog v-model="resdialog" fullscreen hide-overlay transition="scale-transition" v-if="phone">
+        <v-card>
+          <v-toolbar dark>
+            <v-btn icon dark @click="resdialog = false">
+              <v-icon>mdi-close</v-icon>
+            </v-btn>
+            <v-toolbar-title>その他の候補</v-toolbar-title>
+          </v-toolbar>
+          <v-card-title>この結果が必ず元の振り方より優れる訳ではありません。</v-card-title>
+          <v-card-actions>
+            <v-container>
+              <v-row>
+                <v-col cols=12>
+                  <p>元の振り方</p>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col cols=12>
+                  <p>{{char.char}}</p>
+                </v-col>
+              </v-row>
+              <v-row style="text-align: right">
+                <v-col cols=4>
+                  HP(努力値)
+                </v-col>
+                <v-col cols=6>
+                   {{value.HP}} ({{ev.HP}})
+                </v-col>
+                <v-col cols=4>
+                  A(努力値)
+                </v-col>
+                <v-col cols=6>
+                  {{value.A}} ({{ev.A}})
+                </v-col>
+                <v-col cols=4>
+                  B(努力値)
+                </v-col>
+                <v-col cols=6>
+                  {{value.B}} ({{ev.B}})
+                </v-col>
+                <v-col cols=4>
+                  C(努力値)
+                </v-col>
+                <v-col cols=6>
+                  {{value.C}} ({{ev.C}})
+                </v-col>
+                <v-col cols=4>
+                  D(努力値)
+                </v-col>
+                <v-col cols=6>
+                  {{value.D}} ({{ev.D}})
+                </v-col>
+                <v-col cols=4>
+                  S(努力値)
+                </v-col>
+                <v-col cols=6>
+                  {{value.S}} ({{ev.S}})
+                </v-col>
+              </v-row>
+            </v-container>
+          </v-card-actions>
+          <v-divider />
+          <v-card-actions v-for="item in candidations" v-bind:key="item.id">
+            <v-container>
+              <v-row>
+                <v-col cols=12>
+                  <p>{{item.char}}</p>
+                </v-col>
+              </v-row>
+              <v-row style="text-align: right">
+                <v-col cols=4>
+                  HP(努力値)
+                </v-col>
+                <v-col cols=6>
+                   {{item.HP}} ({{item.ev.HP}})
+                </v-col>
+                <v-col cols=4>
+                  A(努力値)
+                </v-col>
+                <v-col cols=6>
+                  {{item.A}} ({{item.ev.A}})
+                </v-col>
+                <v-col cols=4>
+                  B(努力値)
+                </v-col>
+                <v-col cols=6>
+                  {{item.B}} ({{item.ev.B}})
+                </v-col>
+                <v-col cols=4>
+                  C(努力値)
+                </v-col>
+                <v-col cols=6>
+                  {{item.C}} ({{item.ev.C}})
+                </v-col>
+                <v-col cols=4>
+                  D(努力値)
+                </v-col>
+                <v-col cols=6>
+                  {{item.D}} ({{item.ev.D}})
+                </v-col>
+                <v-col cols=4>
+                  S(努力値)
+                </v-col>
+                <v-col cols=6>
+                  {{item.S}} ({{item.ev.S}})
+                </v-col>
+              </v-row>
+            </v-container>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
 
       <v-navigation-drawer
         v-model="drawer"
@@ -631,6 +854,7 @@
 <script>
 import isMobile from 'ismobilejs'
 import pokecalc from '@/lib/calc.js'
+import other from '@/lib/other.js'
 import data from '@/assets/pokemon_data.json'
 import chardata from '@/assets/pokemon_char.json'
 
@@ -656,12 +880,14 @@ export default {
       phone: false,
       drawer: false,
       dialog: false,
+      resdialog: false,
       twitterlink: "https://twitter.com/c_ade_",
       githublink: "https://github.com/rxaru/pokeRVcalculator",
       pokemons: [],
       chars: [],
       char: {},
       id: {},
+      candidations: [],
       value: {
         HP: 0,
         A: 0,
@@ -716,10 +942,9 @@ export default {
         }
       },
       slidercol: 3,
-      checkcol: 1
+      checkcol: 1,
+      res: []
     }
-  },
-  computed: {
   },
   watch: {
     fix510(nv) {
@@ -786,6 +1011,41 @@ export default {
     charset(id) {
       this.char = this.chars[id]
       this.calc()
+    },
+    calcother() {
+      let fix = []
+      if(this.fix.A) {
+        fix.push('A')
+      }
+      if(this.fix.C) {
+        fix.push('C')
+      }
+      if(this.fix.S) {
+        fix.push('S')
+      }
+      if(this.fix.HP) {
+        fix.push('H')
+      }
+      if(this.fix.B) {
+        fix.push('B')
+      }
+      if(this.fix.D) {
+        fix.push('D')
+      }
+      this.res = other(this.pokemon, this.char, this.iv, this.value, this.chars, this.lv, this.fix)
+      this.res = [this.res[0], this.res[1], this.res[2], this.res[3], this.res[4]]
+      this.candidations = []
+      for(let i = 0; i < this.res.length; i++) {
+        for(let j = 0;j < this.chars.length; j++) {
+          if(this.res[i].char === this.chars[j].char) {
+            let tmp = pokecalc(this.pokemon, this.iv, this.res[i], this.lv, this.chars[j].plus, this.chars[j].minus)
+            tmp.char = this.chars[j].char
+            tmp.ev = this.res[i]
+            this.candidations.push(tmp)
+          }
+        }
+      }
+      this.resdialog = true
     }
   }
 }
