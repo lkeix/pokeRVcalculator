@@ -1,4 +1,4 @@
-# pokemoncalc
+# pokemonRVCalculator
 
 ## Project setup
 ```
