@@ -8,10 +8,10 @@
       >
         <v-app-bar-nav-icon @click="drawer = true"></v-app-bar-nav-icon>
 
-        <v-toolbar-title>ポケモン実数値 カリキュレータ</v-toolbar-title>
+        <v-toolbar-title>Pokemon RV Calclator</v-toolbar-title>
       </v-app-bar>
 
-      <v-card>
+      <v-card v-if="!phone">
         <v-card-title></v-card-title>
         <v-row>
           <v-col cols="1" />
@@ -64,6 +64,12 @@
           <v-col cols="4">
             <v-checkbox v-model="fix510" label="努力値を510で設定" />
           </v-col>
+          <v-col cols="3" />
+          <v-col cols="4" v-if="fix510">
+            <v-card-text>
+              <span style="font-size: 20px;">残り {{510 - sum}}</span>
+            </v-card-text>
+          </v-col>
         </v-row>
         <v-row>
           <v-col cols="1" />
@@ -84,6 +90,8 @@
                 :readonly="fix.HP"
                 min="0"
                 :max="evMax.HP"
+                ticks
+                step=4
                 thumb-label="always"
               ></v-slider>
             </v-card-actions>
@@ -118,6 +126,7 @@
                 :readonly="fix.A"
                 min="0"
                 :max="evMax.A"
+                step=4
                 thumb-label="always"
               ></v-slider>
             </v-card-actions>
@@ -152,6 +161,7 @@
                 :readonly="fix.B"
                 min="0"
                 :max="evMax.B"
+                step=4
                 thumb-label="always"
               ></v-slider>
             </v-card-actions>
@@ -186,6 +196,7 @@
                 :readonly="fix.C"
                 min="0"
                 :max="evMax.C"
+                step=4
                 thumb-label="always"
               ></v-slider>
             </v-card-actions>
@@ -220,6 +231,7 @@
                 :readonly="fix.D"
                 min="0"
                 :max="evMax.D"
+                step=4
                 thumb-label="always"
               ></v-slider>
             </v-card-actions>
@@ -254,6 +266,7 @@
                 :readonly="fix.S"
                 min="0"
                 :max="evMax.S"
+                step=4
                 thumb-label="always"
               ></v-slider>
             </v-card-actions>
@@ -277,6 +290,300 @@
           </v-col>
         </v-row>
         -->
+      </v-card>
+      <v-card v-else>
+        <v-card-title></v-card-title>
+        <v-row>
+          <v-col cols="1" />
+          <v-col cols="8">
+            <v-card-actions>
+              <v-select
+                v-model="id"
+                :items="pokemons"
+                item-text="name"
+                item-value="id"
+                filled
+                label="ポケモンを選択"
+              ></v-select>
+            </v-card-actions>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="1" />
+          <v-col cols="4">
+            <v-card-actions>
+              <v-text-field type="number" label="レベル" v-model="lv"></v-text-field>
+            </v-card-actions>
+          </v-col>
+          <v-col cols="3" style="text-align: center;">
+            <v-card-actions>
+              <v-btn color="primary" @click="setlevel(50)">50 Lv</v-btn>
+            </v-card-actions>
+          </v-col>
+          <v-col cols="3" style="text-align: center;">
+            <v-card-actions>
+              <v-btn color="primary" @click="setlevel(100)">100 Lv</v-btn>
+            </v-card-actions>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="1" />
+          <v-col cols="8">
+            <v-select
+            @input="charset"
+            :items="chars"
+            item-text="char"
+            item-value="id"
+            filled
+            label="性格"
+            ></v-select>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="1" />
+          <v-col>
+            <v-dialog v-model="dialog" fullscreen hide-overlay transition="scale-transition">
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  color="primary"
+                  dark
+                  v-bind="attrs"
+                  v-on="on"
+                >
+                  個体値、努力値の確認と設定
+                </v-btn>
+              </template>
+              <v-card>
+                <v-toolbar dark>
+                  <v-btn icon dark @click="dialog = false">
+                    <v-icon>mdi-close</v-icon>
+                  </v-btn>
+                  <v-toolbar-title>個体値と努力値</v-toolbar-title>
+                  <v-spacer></v-spacer>
+                </v-toolbar>
+                <v-list three-line subheader>
+                  <v-list-item>
+                    {{pokemon.name}}
+                  </v-list-item>
+                  <v-divider></v-divider>
+                  <v-list-item>
+                    個体値
+                  </v-list-item>
+                  <v-list-item>
+                    <v-col cols=6>
+                      <v-text-field type="number" label="HP個体値" :disabled="fix.HP" v-model="iv.HP" :rules="[rules.iv.required, rules.iv.valeval]" ></v-text-field>
+                    </v-col>
+                    <v-col cols=6>
+                      <v-text-field type="number" label="HP努力値" :disabled="fix.HP" v-model="ev.HP" :rules="[rules.ev.valeval]"></v-text-field>
+                    </v-col>
+                  </v-list-item>
+
+                  <v-list-item>
+                    <v-col cols=6>
+                      <v-text-field type="number" label="A個体値" :disabled="fix.A" v-model="iv.A" :rules="[rules.iv.required, rules.iv.valeval]" ></v-text-field>
+                    </v-col>
+                    <v-col cols=6>
+                      <v-text-field type="number" label="A努力値" :disabled="fix.A" v-model="ev.A" :rules="[rules.ev.valeval]"></v-text-field>
+                    </v-col>
+                  </v-list-item>
+
+                  <v-list-item>
+                    <v-col cols=6>
+                      <v-text-field type="number" label="B個体値" :disabled="fix.B" v-model="iv.B" :rules="[rules.iv.required, rules.iv.valeval]" ></v-text-field>
+                    </v-col>
+                    <v-col cols=6>
+                      <v-text-field type="number" label="B努力値" :disabled="fix.B" v-model="ev.B" :rules="[rules.ev.valeval]"></v-text-field>
+                    </v-col>
+                  </v-list-item>
+
+                  <v-list-item>
+                    <v-col cols=6>
+                      <v-text-field type="number" label="C個体値" :disabled="fix.C" v-model="iv.C" :rules="[rules.iv.required, rules.iv.valeval]" ></v-text-field>
+                    </v-col>
+                    <v-col cols=6>
+                      <v-text-field type="number" label="C努力値" :disabled="fix.C" v-model="ev.C" :rules="[rules.ev.valeval]"></v-text-field>
+                    </v-col>
+                  </v-list-item>
+
+                  <v-list-item>
+                    <v-col cols=6>
+                      <v-text-field type="number" label="D個体値" :disabled="fix.D" v-model="iv.D" :rules="[rules.iv.required, rules.iv.valeval]" ></v-text-field>
+                    </v-col>
+                    <v-col cols=6>
+                      <v-text-field type="number" label="D努力値" :disabled="fix.D" v-model="ev.D" :rules="[rules.ev.valeval]"></v-text-field>
+                    </v-col>
+                  </v-list-item>
+
+                  <v-list-item>
+                    <v-col cols=6>
+                      <v-text-field type="number" label="S個体値" :disabled="fix.S" v-model="iv.S" :rules="[rules.iv.required, rules.iv.valeval]" ></v-text-field>
+                    </v-col>
+                    <v-col cols=6>
+                      <v-text-field type="number" label="S努力値" :disabled="fix.S" v-model="ev.S" :rules="[rules.ev.valeval]"></v-text-field>
+                    </v-col>
+                  </v-list-item>
+                </v-list>
+              </v-card>
+            </v-dialog>
+          </v-col>
+        </v-row>
+        <v-divider />
+        <v-row>
+          <v-col cols=6>
+            <v-card-actions>
+              <v-slider
+                v-model="ev.HP"
+                :readonly="fix.HP"
+                min="0"
+                :max="evMax.HP"
+                step=4
+                thumb-label="always"
+                inverse-label
+                label="HP"
+              ></v-slider>
+            </v-card-actions>
+          </v-col>
+          <v-col cols=3>
+            <v-card-actions>
+              <v-checkbox label="固定" @click="fix.HP = !fix.HP" />
+            </v-card-actions>
+          </v-col>
+          <v-col cols=3>
+            <v-card-text style="text-align: center; font-size: 24px;">
+              {{value.HP}}
+            </v-card-text>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols=6>
+            <v-card-actions>
+              <v-slider
+                v-model="ev.A"
+                :readonly="fix.A"
+                min="0"
+                :max="evMax.A"
+                step=4
+                thumb-label="always"
+                inverse-label
+                label="A"
+              ></v-slider>
+            </v-card-actions>
+          </v-col>
+          <v-col cols=3>
+            <v-card-actions>
+              <v-checkbox label="固定" @click="fix.A = !fix.A" />
+            </v-card-actions>
+          </v-col>
+          <v-col cols=3>
+            <v-card-text style="text-align: center; font-size: 24px;">
+              {{value.A}}
+            </v-card-text>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols=6>
+            <v-card-actions>
+              <v-slider
+                v-model="ev.B"
+                :readonly="fix.B"
+                min="0"
+                :max="evMax.B"
+                step=4
+                thumb-label="always"
+                inverse-label
+                label="B"
+              ></v-slider>
+            </v-card-actions>
+          </v-col>
+          <v-col cols=3>
+            <v-card-actions>
+              <v-checkbox label="固定" @click="fix.B = !fix.B" />
+            </v-card-actions>
+          </v-col>
+          <v-col cols=3>
+            <v-card-text style="text-align: center; font-size: 24px;">
+              {{value.B}}
+            </v-card-text>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols=6>
+            <v-card-actions>
+              <v-slider
+                v-model="ev.C"
+                :readonly="fix.C"
+                min="0"
+                :max="evMax.C"
+                step=4
+                thumb-label="always"
+                inverse-label
+                label="C"
+              ></v-slider>
+            </v-card-actions>
+          </v-col>
+          <v-col cols=3>
+            <v-card-actions>
+              <v-checkbox label="固定" @click="fix.C = !fix.C" />
+            </v-card-actions>
+          </v-col>
+          <v-col cols=3>
+            <v-card-text style="text-align: center; font-size: 24px;">
+              {{value.C}}
+            </v-card-text>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols=6>
+            <v-card-actions>
+              <v-slider
+                v-model="ev.D"
+                :readonly="fix.D"
+                min="0"
+                :max="evMax.D"
+                step=4
+                thumb-label="always"
+                inverse-label
+                label="D"
+              ></v-slider>
+            </v-card-actions>
+          </v-col>
+          <v-col cols=3>
+            <v-card-actions>
+              <v-checkbox label="固定" @click="fix.D = !fix.D" />
+            </v-card-actions>
+          </v-col>
+          <v-col cols=3>
+            <v-card-text style="text-align: center; font-size: 24px;">
+              {{value.D}}
+            </v-card-text>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols=6>
+            <v-card-actions>
+              <v-slider
+                v-model="ev.S"
+                :readonly="fix.S"
+                min="0"
+                :max="evMax.S"
+                step=4
+                thumb-label="always"
+                inverse-label
+                label="S"
+              ></v-slider>
+            </v-card-actions>
+          </v-col>
+          <v-col cols=3>
+            <v-card-actions>
+              <v-checkbox label="固定" @click="fix.S = !fix.S" />
+            </v-card-actions>
+          </v-col>
+          <v-col cols=3>
+            <v-card-text style="text-align: center; font-size: 24px;">
+              {{value.S}}
+            </v-card-text>
+          </v-col>
+        </v-row>
       </v-card>
 
       <v-navigation-drawer
@@ -348,7 +655,7 @@ export default {
     return {
       phone: false,
       drawer: false,
-      window_height: 500,
+      dialog: false,
       twitterlink: "https://twitter.com/c_ade_",
       githublink: "https://github.com/rxaru/pokeRVcalculator",
       pokemons: [],
@@ -365,6 +672,7 @@ export default {
       },
       pokemon: {},
       lv: 50,
+      sum: 0,
       fix510: false,
       fix: {
         HP: false,
@@ -427,6 +735,7 @@ export default {
     ev: {
       handler() {
         this.calc()
+        this.sum = this.ev.HP + this.ev.A + this.ev.B + this.ev.C + this.ev.D + this.ev.S
         if (this.fix510) {
           this.evMax.HP = this.calcleave('H')
           this.evMax.A = this.calcleave('A')
