@@ -1,0 +1,127 @@
+[
+    {
+      "char": "さみしがり",
+      "plus": "A",
+      "minus": "B"
+    },
+    {
+      "char": "いじっぱり",
+      "plus": "A",
+      "minus": "C"
+    },
+    {
+      "char": "やんちゃ",
+      "plus": "A",
+      "minus": "D"
+    },
+    {
+      "char": "ゆうかん",
+      "plus": "A",
+      "minus": "S"
+    },
+    {
+      "char": "ずぶとい",
+      "plus": "B",
+      "minus": "A"
+    },
+    {
+      "char": "わんぱく",
+      "plus": "B",
+      "minus": "C"
+    },
+    {
+      "char": "のうてんき",
+      "plus": "B",
+      "minus": "D"
+    },
+    {
+      "char": "のんき",
+      "plus": "B",
+      "minus": "S"
+    },
+    {
+      "char": "ひかえめ",
+      "plus": "C",
+      "minus": "A"
+    },
+    {
+      "char": "おっとり",
+      "plus": "C",
+      "minus": "B"
+    },
+    {
+      "char": "うっかりや",
+      "plus": "C",
+      "minus": "D"
+    },
+    {
+      "char": "れいせい",
+      "plus": "C",
+      "minus": "S"
+    },
+    {
+      "char": "おだやか",
+      "plus": "D",
+      "minus": "A"
+    },
+    {
+      "char": "おとなしい",
+      "plus": "D",
+      "minus": "B"
+    },
+    {
+      "char": "しんちょう",
+      "plus": "D",
+      "minus": "C"
+    },
+    {
+      "char": "なまいき",
+      "plus": "D",
+      "minus": "S"
+    },
+    {
+      "char": "おくびょう",
+      "plus": "S",
+      "minus": "A"
+    },
+    {
+      "char": "せっかち",
+      "plus": "S",
+      "minus": "B"
+    },
+    {
+      "char": "ようき",
+      "plus": "S",
+      "minus": "C"
+    },
+    {
+      "char": "むじゃき",
+      "plus": "S",
+      "minus": "D"
+    },
+    {
+      "char": "てれや",
+      "plus": "",
+      "minus": ""
+    },
+    {
+      "char": "がんばりや",
+      "plus": "",
+      "minus": ""
+    },
+    {
+      "char": "すなお",
+      "plus": "",
+      "minus": ""
+    },
+    {
+      "char": "きまぐれ",
+      "plus": "",
+      "minus": ""
+    },
+    {
+      "char": "まじめ",
+      "plus": "",
+      "minus": ""
+    }
+  ]
